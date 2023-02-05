@@ -1,0 +1,14 @@
+# build
+FROM node:16.15.0-alpine as build
+WORKDIR /usr/src/app
+
+COPY ./src/react-app/ /usr/src/app/
+RUN yarn install
+RUN yarn build
+
+FROM nginx:alpine as nginx
+COPY --from=build /usr/src/app/build /var/www
+COPY ./nginx /etc/nginx/conf.d/
+
+WORKDIR /usr/share/nginx/html
+CMD ["nginx", "-g", "daemon off;"]
